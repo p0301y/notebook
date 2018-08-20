@@ -47,6 +47,12 @@ git branch -D name  强行删除一个从未被合并的分支
 
 git tag v1.0  创建标签
 
+git rm file_path 删除暂存区或分支上的文件，同时工作区也不需要这个文件了
+
+git rm --cached file_path 删除暂存区或分支上的文件，但是本地需要使用，只是不希望这个文件被版本控制，结合.gitignore文件使用
+
+git fetch origin + git diff 本地分支(local branch) origin/远程分支(remote branch)  对比当前工作区与远程仓库的区别
+
 git对比两个分支的差异：master,dev
 查看dev有，而master中没有的：git log dev ^master
 查看master中有，而dev中没有的内容： git log master ^dev
@@ -222,4 +228,25 @@ git config user.name ''
 git config user.email ''
 ```
 
+### git中的子模块管理的使用
+1. 使用场景
+    - 多个主项目(A\B\C)都依赖于子项目sub(或者说是一个通用的库lib)：当子项目代码更新的时候，主项目只要通过
+    git上的主项目会自动更新，但是clone到本地的主项目只需要updata命令就可以更新依赖；主项目和子项目的维护
+    相互独立，互不干扰
+2. submodule
+    - git Submodule允许子项目单独作为一个git项目存在在父项目中，子项目可以有自己独立的commit,push,pull等操作
+3. 项目中使用Submodule
+     - git命令添加submodule：git submodule add git@github.com:jjz/pod-library.git pod-library
+      将git@github.com:jjz/pod-library.git添加到pod-library文件夹下
+     - 修改submodule: cd pod-library git status/add/commit
+     - 更新submodule: git submodule foreach git pull （在父项目下直接运行） cd and git pull (在submodule目录下更新)
+     - clone submodule: 
+        1. 采用递归的方式clone整个项目(--recursive): git clone git@github.com:jjz/pod-project.git --recursive
+        2. 先clone父项目，然后初始化和更新子项目:   
+        初始化    
+        git clone git@github.com:jjz/pod-project.git     
+        cd pod-project   
+        git submodule init   
+        更新   
+        git submodule update
 

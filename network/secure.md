@@ -32,7 +32,11 @@
     - 客户端使用用户名跟密码请求登陆
     - 服务器端收到请求，去验证用户名和密码成功后，服务器端会签发一个token，再把这个token发送给客户端
     - 客户端收到token存储（cookie或者localStorage），然后每次请求带着token，服务端进行验证
-
+4. token（JWT java web token）相对于cookie和session验证机制的区别：
+    - cookie和session机制需要将信息保存在服务端，例如在数据库中，作为数据持久化，每次请求的验证，都需要从数据库获取对比验证  
+    - token是基于签名，也可以叫加密，由header.payload.signature组成，token有服务器端生成，payload存放
+    json数据，signature是加密，每次服务器的验证，只需要对signature解密，看看解密结果是否与payload相同，就不需要在数据库额外存储数据了，
+    换句话说，服务器自己签名的东西，只有自己认识，只是认识的方式不一样了，或者说验证方式不一样了
 ## XSS和CSRF防御
 - XSS跨站脚本（cross-site scripting）和CSRF跨站请求伪造（cross-site request forgery）都属于跨站攻击，XSS是实现CSRF诸多途径中的一条，但不是唯一一条；XSS的本质是让对方浏览器执行
 你插入的js，来获取cookie等信息；而CSRF是借用户的身份，向服务器发送请求
