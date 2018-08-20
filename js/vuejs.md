@@ -757,3 +757,114 @@ Vue.prototype.$myMethod = function(options){
 └── views               # 存放视图类组件
 
 ```
+
+## 对vue中slot的理解
+1. 首先理解一下普通的组件:这种组件产生的样式都在自定义组件的内部，使用者是无法对齐进行调整的，或者说没办法通过传入html进行调整
+```
+<自定义组件 :参数='variable' @事件='handler'></自定义组件>
+```
+例子： 名片组件的需求，该名片组件的除了标题外还希望提供使用者比哪里可以自行调整主题内容的格式
+```
+<名片 :url='名片地址'>
+    <h1>我是阿发</h1>
+    <img src=''/>
+</名片>
+```
+2. slot的使用：父组件中的内容替代了子组件中的slot标签，使得我们可以在不同地方使用子组件的结构而且填充不同的父组件内容，传递参数的一种方式
+```
+//定义组件my-component(包括具名和不具名)
+<div class='myComponent'>
+    <slot></slot>
+</div>
+//使用方法
+<my-component>\
+    <p>ashfdlksahkjfdsahfdkj</p>
+</my-componet>
+```
+3. 都是代码的重用，或者说是多态的一种实现方式，区别是参数不一样，没有父子组件的关系，样式的作用域不同
+
+## vue中的computed属性非常频繁的被使用到，那么：计算属性如何与属性建立依赖关系？属性发生变化又如何通过计算属性重新计算？
+- 如何建立依赖关系，语法解析是非常耗费性能的，而且解析比较麻烦，不准确而且会出错；所以利用JavaScript单线程的原理
+和vue的getter设计，通过一个简单的发布订阅，就可以在一次计算属性求职的过程中收集到相关依赖
+1. data属性初始化getter和setter
+```
+Object.definedProperty(obj,key,{
+    enumerable: true,
+    configurable: true,
+    get: function reactiveGetter () {
+        const value = getter ? getter.call(obj) : val
+        //判断是否处于依赖收集状态
+        if (Dep.target) {
+            //建立依赖关系
+            dep.depend()
+            ...
+        }
+        return value
+    },
+    set: function reactiveSetter (newVal) {
+        ...
+        //依赖发生变化，通知计算属性重新计算
+        dep.notify()
+    },
+})
+```
+2. computed计算属性初始化
+```javascript 1.8
+function initComputed(vm: Component, component: Object) {
+    // ...
+    // 遍历computed计算属性
+    for (const key in computed){
+        // ...
+        // 创建watcher实例
+        watchers[key] = new Watcher(vm,  getter || noop, noop, computedWatcherOptions)
+        
+        // 创建属性vm.reversedMessage,并将提供的函数将用作属性vw.reversedMessage的getter
+        // 最终computed与data会一起混合到vm下，所以当computed与data存在重名属性的时候会抛出警告
+        defineComputed(vm, key, userDef)
+        // ...
+    }
+}
+```
+
+## vue的同构之路
+vue的同构也就是服务器渲染(server side render)  
+客户端渲染的缺点：  
+    - 对搜索引擎的优化(SEO: Search Engine Optimization)不友好，各个搜索引擎实际上都是对网页的html结构和同步javascript
+    代码进行索引，因而客户端渲染可能会造成你的网页无法被搜索引擎正确索引  
+    - TTC(内容到达时间长: time-to-content)时间过长，如果设备的网络较差，或者说首页加载的内容较多，用户需要等待较长时间才能够看到页面的内容，
+    等待期间看到的都是网页的白屏或其他加载状态  
+    注意： 从我的理解是，渲染的过程就是vue实例的初始化过程，只是将vue的初始化放在了server上，而不是客户端上
+1. vue的服务器端渲染使用官方提供的库vue-server-render,采用express作为后端服务器  
+```javascript
+const Vue = require('vue')
+const server = require('express')()
+
+// 创建render
+const render = require('vue-server-render').createRenderer()
+
+server.get('*', (req, res) => {
+    // 创建vue实例
+    const app = new Vue({
+        data: {
+            url: req.url,
+        },
+        template: `<div>访问的url是: {{ url }}</div>`
+    })
+    
+    render.renderToString(app, (err, html) => {
+        if(err){
+            // ...
+            return
+        }
+        
+        // 参数html就是vue实例app渲染的html
+        res.end(`
+            <!DOCTYPE html>
+            <html lang='en'>
+                <head><title>Hello</title></head>
+                <body>${ html }</body>
+            </html>
+        `)
+    })
+})
+```
