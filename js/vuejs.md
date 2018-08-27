@@ -868,3 +868,18 @@ server.get('*', (req, res) => {
     })
 })
 ```
+
+## 基于vue的ssr服务端渲染
+
+概述： 服务端渲染的优势在于更好的seo以及更快的渲染速度，尤其是首屏加载的问题，
+参考的项目： git@github.com:muwoo/doubanMovie-SSR.git    
+
+1、基本知识
+    - 要使用服务器端渲染，需要使用server-entry.js何client-entry.js两个入口文件，两者都会使用到app.js
+    进行打包，其中server-entry.js打包的代码是运行在node端，二是通过client-entry.js打包代码运行在客户端：
+    具体的流程图如下:![](../image/7.png)
+    从图中可以看出，SSR有两个入口文件client.js和server.js,都包含了应用代码，webpack通过两个入口文件分别打包成
+    server bundle和client bundle,当服务器接收到了来自客户端的请求之后，会创建一个渲染器bundleRender,这个
+    bundleRender会读取生成的server bundle,并执行他的代码，然后发送一个生成好的html到浏览器，等到客户端client bundle
+    加载之后，会和服务器生成的dom进行Hydration(判断这个dom和自己即将生成的DOM是否相同，如果相同就将客户端的Vue实例挂在到这个dom上
+    ，否则会提示警告)。参考链接: http://www.cnblogs.com/zhuzhenwei918/p/9266407.html
