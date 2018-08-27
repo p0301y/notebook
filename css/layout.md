@@ -400,3 +400,72 @@ div.parent
     flex:1;
 }
 ```
+
+## 移动端的适配方案
+1. 理解几个基本的概念
+    - 设备像素：物理像素，又叫分辨率，单位是pt
+    - 屏幕尺寸：屏幕对角线的长度
+    - 屏幕像素密度（ppi）：根据物理像素和屏幕尺寸计算出来的，原则上ppi越高越好，因为图像会更加清晰
+    - css像素：又称为是逻辑像素， 是css和js中使用的一个抽象的概
+    - 布局视口（layout viewport）：可以用来布局的视口大小，包括滚动条
+    - 视觉视口(visual viewport)：可以看作是手机屏幕这么大的窗口
+    ```
+    <meta name='viewport' content='width=device-width'>  //将layout viewport设置为屏幕的宽度
+    <meta name='viewport' content='width=640'>  //将layout viewport宽度设置为640px(逻辑像素)
+    <meta name='viewport' content='inital-scale=0.5'>  //visusl viewport的0.5倍是屏幕宽度，
+    所以visual viewport的宽度就是屏幕的2倍了，此时布局视口的宽度也是屏幕宽度的2倍
+    ```
+    - 总结： width=x设置布局视口，initial-scale=y设置视觉视口；
+    如果只设置布局视口和视觉视口中的一个，那么另一个也是同样的宽度；
+    布局视口的宽度始终大于等于视觉视口
+    ```
+    <meta name='viewport' content='width=device-width,initial-scale=1.0'>
+    // layout viewport浏览器窗口，设置为屏幕宽度，visual viewport设置为屏幕宽度，不放缩，屏幕多宽就显示多少像素，也就是所谓的完美视口
+    ```
+2. 移动端的适配方案
+    - 固定高度，宽度自适应: 随着屏幕宽度的变化，页面也会跟着变化，效果和pc页面的流体布局差不多
+    ```css
+    <meta name='viewpport' content='width=device-width,initial-scale=1'>
+    ```
+    - 固定宽度，viewport缩放：根据页面的宽度，计算initial-scale的值，来动态生成viewport，
+    - 使用rem或者vw/vh作宽度：其中使用rem的时候，根据屏幕的宽度，动态设置rem对应的px值，即html{font-size: x}
+    - 使用阿里的flexible
+3. 总结
+    - 物理像素：手机屏幕上最小的物理显示单元
+    - css像素（设备独立像素）：一种度量单位
+    - 设备像素比（dpr）： 物理像素 / css像素，比如一个移动设备的物理像素为640px,他的屏幕宽度为320px，则dpr=2，可以通过window.devicePixelRatio获取dpr
+    - 举例：一个交互稿为640px宽度，设备A、B的宽度320px，A的dpr为1，B的dpr为2，那么如何适配这两种屏幕呢？  
+    1. 设置html中font-size的值，即rem的值(rem = document.documentElement.clientWidth * dpr / 10)：A(320 / 10) = 32px  B(320*2 / 10) = 64px
+    2. 设置initial-scale的值，即缩放比例(scale = 1 / dpr)
+    3. 设置data-dpr(用于css hack使用)： data-dpr = dpr
+    4. 字体的大小设置(任何手机屏幕的字体大小都要统一)： font-size: 16px; [data-dpr='2'] input { font-size: 32px; }
+    ```javascript
+    var dpr, rem, scale
+    var docEl = document.documentElement
+    var fontEl = document.createElement('style')
+    var metaEl = document.querySelector('meta[name="viewport"]')
+    
+    dpr = window.devicePixelRatio || 1
+    rem = docEl.clientWidth * dpr / 10
+    scale = 1 / dpr
+    
+    // 设置viewport，进行放缩，达到高清效果
+    metaEl.setAttribute('content', `width=${dpr*docEl.clientWidth}`, `initial-scale=${scale}`)
+    
+    // 设置data-dpr属性，留作的css hack之用
+    docEl.setAttribute('data-dpr', dpr)
+    
+    // 动态写入样式
+    docEl.firstElementChild.appendChild(fontEl)
+    fontEl.innerHTML = `html{font-size: ${rem}px !important;`
+    
+    // 给js调用的，某一dpr下rem与px之间的转换函数
+    window.rem2px = function(v){
+       v = parseFloat(v)
+       return v * rem
+    }
+    
+    window.dpr = dpr
+    window.rem = rem
+    ```
+    
