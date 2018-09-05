@@ -883,3 +883,56 @@ server.get('*', (req, res) => {
     bundleRender会读取生成的server bundle,并执行他的代码，然后发送一个生成好的html到浏览器，等到客户端client bundle
     加载之后，会和服务器生成的dom进行Hydration(判断这个dom和自己即将生成的DOM是否相同，如果相同就将客户端的Vue实例挂在到这个dom上
     ，否则会提示警告)。参考链接: http://www.cnblogs.com/zhuzhenwei918/p/9266407.html
+    
+## vue的插槽
+1. 匿名插槽和具名插槽（简单插槽，子组件只是提供一个位置，占位符，所有的模板、数据和样式都来自于父元素）
+```html
+<template>
+<div class="father">
+    <h3>父组件</h3>
+    // 引用子组件
+    <child>
+        <div slot="test">
+            <span>sahdfkjashfkj</span>
+        </div>
+    </child>
+</div>
+</template>
+<template>
+<div class="child">
+    <h3>子组件</h3>
+    <slot name="test"></slot>
+</div>
+</template>
+
+```
+2. 作用域插槽（带数据的插槽，父组件提供模板和样式）
+```html
+<template>
+<div class="father">
+    <h3>父组件</h3>
+    <child>
+        <template slot-scope="user">
+            <div class="tpm">
+                <span v-for="item in user.data">{{ item }}</span>
+            </div>
+        </template>
+    </child>
+</div>
+</template>
+<template>
+    <div class="child">
+        <h3>子组件</h3>
+        <slot :data="data"></slot>
+    </div>
+</template>
+
+export default {
+    data: function(){
+        return {
+            data: [....]
+        }
+    }
+}
+
+```
