@@ -971,6 +971,8 @@ concat: 连接多个数组，返回新的数组
 join: 将数组中所有元素以参数作为分隔符放入一个字符
 slice: slice(start,end): 返回选定元素
 map,filter,forEach,some,every: 等不改变原数组
+3. 可以中断函数的循环，类似与break的作用  
+every和some直到遇到return true或者数组结尾，才会退出循环
 
 
 ## js中间件的主框架实现
@@ -1002,3 +1004,14 @@ function middleware(context,next) {
 
 spa.add(middleware)
 ```
+
+## js执行会阻塞dom树的解析和渲染，那么css加载会阻塞DOM树的解析和渲染吗？
+- css加载不会阻塞dom树的解析
+- css加载会阻塞dom树的渲染
+- css加载会阻塞后面js语句的执行
+
+因此：为了避免让用户看到长时间的白屏时间，我们应该尽可能提高css加载速度，有以下几种方法：
+   - 使用CDN（因为CDN会根据你的网络状况，挑选最近的一个具有缓存内容的节点为你提供资源，因此可以减少加载时间）
+   - 对css进行压缩（如打包工具webpack和gulp）
+   - 合理的使用缓存(设置cache-control,expires,以及E-tag都是不错的，不过要注意一个问题，就是文件更新后，如何刷新缓存区文件，一个解决方案就是文件加上版本号)
+   - 减少http请求（合并文件）
