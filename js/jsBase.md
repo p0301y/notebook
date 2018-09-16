@@ -600,6 +600,28 @@ console.log(target - now)
     - 节流(throttle)和防抖(debounce)都是用来控制某个函数在一定的时间内执行多少次，区别在于throttle保证在一定的时间内必须执行一次
     1. debounce把非常频繁的事件（比如按键）合并成一次执行，比如搜索的精准匹配
     2. throttle保证每X毫秒恒定的执行次数，比如每次200ms检查滚动的位置，并触发css动画
+```javascript
+function test() {
+    console.log('result: ')
+}
+
+
+const debounce = (function () {
+    let timer
+
+    return function (fn, delay) {
+        const context = this
+
+        clearTimeout(timer)
+
+        timer = setTimeout(function () {
+            fn.call(context)
+        }, delay)
+    }
+})()
+
+debounce(test, 2000)
+```
 ```
 n=0;
     //节流函数
@@ -1015,3 +1037,39 @@ spa.add(middleware)
    - 对css进行压缩（如打包工具webpack和gulp）
    - 合理的使用缓存(设置cache-control,expires,以及E-tag都是不错的，不过要注意一个问题，就是文件更新后，如何刷新缓存区文件，一个解决方案就是文件加上版本号)
    - 减少http请求（合并文件）
+   
+## 回调函数传参
+- 增加额外的参数
+```javascript
+function A(value) {
+  console.log(value)
+}
+
+function B(callback, param) {
+  callback(param)
+}
+
+B(A, 1)
+```
+- 使用闭包原则
+```javascript
+function A(value) {
+  console.log(value)
+}
+
+function B(callback) {
+  callback()
+}
+
+B(function() {
+  A(1)
+})
+```
+
+## event事件的执行顺序的问题
+问题描述： blur事件和click事件连续执行的问题
+解决办法： blur会在click之前执行，而mousedown事件会在blur之前执行，所以将click改成mousedown
+
+## 解决问题
+问题描述：点击一块区域之外的地方，然后此区域消失
+解决方案： 全局绑定click，目标区域最外层元素dom1，事件触发元素dom2(e.target)，循环dom2到body，查看中间有没有dom1节点，若没有，则隐藏

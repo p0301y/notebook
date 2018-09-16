@@ -203,6 +203,9 @@ ssh-add ~/.ssh/filename1
 ssh-add ~/.ssh/filename2
 ```
 4. 将公钥复制到远程settings中
+```
+ssh -T git@github.com //查看连接是否成功
+```
 5. 在.ssh文件夹下配置文件
 ```
 touch config
