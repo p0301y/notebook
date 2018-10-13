@@ -1072,4 +1072,4 @@ B(function() {
 
 ## 解决问题
 问题描述：点击一块区域之外的地方，然后此区域消失
-解决方案： 全局绑定click，目标区域最外层元素dom1，事件触发元素dom2(e.target)，循环dom2到body，查看中间有没有dom1节点，若没有，则隐藏
+解决方案： 全局绑定click，目标区域最外层元素dom1，事件触发元素dom2(e.target)，循环dom2到body，查看中间有没有dom1节点，若没有，则隐藏(也可以直接使用node.contains(childNode)方法)
