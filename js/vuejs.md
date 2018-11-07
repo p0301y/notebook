@@ -667,6 +667,7 @@ export default class VueRouter{
 window.history.pushState(stateObject,title,URL)
 window.history.replaceState(stateObject,title,URL)
 ```
+$route和$router的区别：$router是一个vue-router实例对象，包含路由对象与属性；$route是一个跳转的路由对象，每一个路由都会有一个route对象，是一个局部对象，可以获取对应的name,path,params,query等，可以通过vue-devtools看到每个路由对象的不同。
  - stateObject: 当浏览器跳转到新的状态时，将触发popState事件，该事件将携带这个stateObject参数的副本
  - title: 所添加记录的标题
  - url: 添加记录的url
