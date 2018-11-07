@@ -28,3 +28,6 @@ http-equiv顾名思义，相当于http的文件头作用，它可以向浏览器
     ```
 2. readonly属性在ie8下失效等问题
     - 设置unselecteble = "on"
+3. input标签设置disabled和readonly的区别
+    - readonly只针对input（text/password）和textarea有效，而disabled对于所有的表单元素都有效，包括select, radio, checkbox等
+    - 表单元素使用GET或者post方式提交时，表单元素在使用了readonly后，值可以传递到后台；而表单元素在使用disabled后值不可以传递到后台

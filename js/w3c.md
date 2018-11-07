@@ -275,6 +275,10 @@ function deepCopy(obj){
 
     return newObj
 }
+//巧妙的拷贝
+function deepCopy(obj){
+    return JSON.parse(JSON.stringify(obj))
+}
 ```
 ## float与position:absolute的区别
 float脱离文档流的时候，其他盒子会无视他，即和浮动盒子重叠，但是它的内容即文本会让出地方

@@ -1002,3 +1002,54 @@ function middleware(context,next) {
 
 spa.add(middleware)
 ```
+
+## js中的try..catch结合使用throw
+1. 使用实例
+```
+function parent (num){
+    if (num > 10) throw '数字不能大于10'
+
+    console.log('jump')
+}
+function sub () {
+    try {
+        parent(23)
+        console.log('turn to one')
+    }catch (er){
+        console.log('er: ', er)
+    }
+
+    console.log('turn to two')
+}
+sub()
+VM853:11 er:  数字不能大于10
+VM853:14 turn to two
+```
+2. 结合error对象一起使用
+```
+class MyError4 extends Error{
+    constructor (name, message) {
+        super ()
+        this.name = name
+        this.message = message
+    }
+}
+function parent (num){
+    if (num > 10) throw new MyError4('num', 'num不能大于10')
+
+    console.log('jump')
+}
+function sub () {
+    try {
+        parent(23)
+        console.log('turn to one')
+    }catch (er){
+        console.log('er: ', er.message)
+    }
+
+    console.log('turn to two')
+}
+sub()
+VM528:18 er:  num不能大于10
+VM528:21 turn to two
+```
